@@ -6,7 +6,7 @@
     window.isYuzuWardrobeLoaded = true;
 
     // --- 全局变量和状态 ---
-    let wardrobeData = null; // 存储从JSON加载的数据
+let wardrobeData = null; // 存储从JSON加载的数据
     let currentSelection = { // “购物车”，存储当前选择
         characterName: "{{user}}", // 默认角色名
         mainItems: [],
@@ -16,11 +16,11 @@
 
     // --- 核心功能函数 ---
 
-    // 1. 从服务器加载JSON数据
+    // 1. 从你的GitHub地址加载JSON数据
     async function loadWardrobeData() {
         try {
-            // 注意：请将这里的URL替换成你上传JSON文件后的实际地址
-            const response = await fetch('data/the-wardrobe.json');
+            // 注意看这里！我已经把你的地址更新在这里了！
+            const response = await fetch('https://yutsuki0110.github.io/YUZU/data/the-wardrobe.json');
             if (!response.ok) throw new Error('网络响应错误');
             wardrobeData = await response.json();
         } catch (error) {
@@ -35,7 +35,6 @@ console.error('加载YUZUの衣橱数据失败：', error);
         cleanupUI();
 
         const css = `
-            /* 此处是完整的CSS样式代码 */
             .yuzu-wardrobe-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9998; display: flex; align-items: center; justify-content: center; }
             .yuzu-wardrobe-container { background: #2a2a2a; color: #fff; width: 90%; max-width: 800px; height: 85vh; max-height: 700px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; border: 1px solid #444; }
             .yuzu-wardrobe-header { padding: 15px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
@@ -130,6 +129,7 @@ console.error('加载YUZUの衣橱数据失败：', error);
                 gridHtml += `<button class="yuzu-wardrobe-btn" data-path-next="${key}">${key}</button>`;
             });
         }
+
         const modifiersHtml = Object.entries(wardrobeData.modifiers).map(([category, items]) => {
            const itemsHtml = Object.entries(items).map(([key, value]) => {
                const isSelected = currentSelection.modifiers.includes(value);
@@ -137,6 +137,7 @@ console.error('加载YUZUの衣橱数据失败：', error);
            }).join('');
            return `<h3>${category}</h3><div class="yuzu-wardrobe-grid">${itemsHtml}</div>`;
         }).join('');
+
         main.innerHTML = `
             <div class="yuzu-wardrobe-path">${pathString}</div>
             <div class="yuzu-wardrobe-grid">${gridHtml}</div>
@@ -173,7 +174,6 @@ console.error('加载YUZUの衣橱数据失败：', error);
             } else {
                 list.push(item); // 否则添加
             }
-            // 更新按钮状态
             target.classList.toggle('selected');
             updateOutput();
         }
@@ -184,21 +184,20 @@ console.error('加载YUZUの衣橱数据失败：', error);
         const character = currentSelection.characterName;
         const allItems = [...currentSelection.mainItems, ...currentSelection.modifiers];
         const itemsString = allItems.length > 0 ? allItems.join('，') : '...';
-
-        const finalRequest = `<request: ${character}的穿着：${itemsString}，这是${character}的穿着，请注意哪些是其它角色从外面可见的，哪些是从外部不可见的，同时要合理融入文本创作中>`;
+const finalRequest = `<request: ${character}的穿着：${itemsString}，这是${character}的穿着，请注意哪些是其它角色从外面可见的，哪些是从外部不可见的，同时要合理融入文本创作中>`;
 
         const outputArea = document.querySelector('.yuzu-wardrobe-output');
         if (outputArea) {
             outputArea.value = finalRequest;
         }
-}
+    }
 
     // 8. 发送指令到酒馆
     function sendRequest() {
         const outputArea = document.querySelector('.yuzu-wardrobe-output');
         const command = outputArea.value;
         if (command && typeof putUserText === 'function') {
-putUserText(command);
+            putUserText(command);
             cleanupUI();
         } else if (command && typeof slash === 'function') {
             slash('send', command);
